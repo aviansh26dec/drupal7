@@ -1,0 +1,334 @@
+<?php
+/**
+ * @sendrill
+ * Subscription form popup appear on home page.
+ */
+
+ /**
+ * Add a popup to the current page.
+ */
+function sendgrid_init() {
+
+    if(!empty($_POST['cookie'])){
+      $remote = $_SERVER['REMOTE_ADDR'];
+      setcookie("hidePopup", $remote, time() + (60));;
+      // print_r($_COOKIE['hidePopup']); //outputs value
+      exit;
+    }
+    
+
+    // Send Grid Api Integration
+    if(!empty($_POST['email'])){
+      $squery = db_select('sendgrid_api', 'api_key');
+      $squery->fields('api_key');
+      $sresult = $squery->execute();
+      $sdata = $sresult->fetchObject();
+
+      $email = $_POST['email'];
+      $list_id = $sdata->subscriber_id;
+      $username = $sdata->username;
+      $password = $sdata->password;
+      $secret_key = $sdata->secret_key;
+      $api_key = $sdata->api_key;
+      $api_status = $sdata->status;
+      
+      // ============================================================================
+
+      $url = "https://api.sendgrid.com/v3/contactdb/recipients";
+      $data = [array(
+      // 'api_user' => 'tepiaco', 
+      // 'api_key' => 'tepia15561',
+      'email' => $email,
+      
+      )];
+      $jsondata = json_encode($data);
+      $header = array(
+      'accept: application/json',
+      "authorization: Bearer $secret_key",
+      // 'User-Agent: sendgrid/v3;php',
+      );
+      // print_r($header); exit;
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+      // curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-MCAPI/2.0');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $jsondata);                                                                                                                  
+
+      $result = curl_exec($ch);
+
+      $regId = json_decode($result);
+      $getRegId = $regId->persisted_recipients[0]; 
+      if($regId->new_count == 0){
+        echo "<div class='send_error'>You are already subscribed with us.</div>";
+        exit;
+      }
+      $url = "https://api.sendgrid.com/v3/contactdb/lists/$list_id/recipients/$getRegId";
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+      // curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-MCAPI/2.0');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+          'accept: application/json',
+          "authorization: Bearer $secret_key",
+          // 'User-Agent: sendgrid/v3;php',
+          ));
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $jsondata);                                                                                                                  
+
+      $result = curl_exec($ch);
+
+      if($result==''){
+        echo "<div class='send_success'>You are subscribed Sucessfully. </div>";
+      }
+
+      // =============================================================================
+
+      exit;
+    }
+
+    // Get base url path
+    $path = drupal_get_path('module', 'sendgrid');
+    // Add css file
+    drupal_add_css($path . '/css/sendgrid_onload.css');
+
+    if(@$_COOKIE['hidePopup'] != $_SERVER['REMOTE_ADDR']){
+      // Check Front Page or not
+
+      // Get Data From Database
+      $squery = db_select('sendgrid_api', 'api_key');
+      $squery->fields('api_key');
+      $sresult = $squery->execute();
+      $sdata = $sresult->fetchObject();
+
+      $email = @$_POST['email'];
+      $list_id = @$sdata->subscriber_id;
+      $username = @$sdata->username;
+      $password = @$sdata->password;
+      $secret_key = @$sdata->secret_key;
+      $api_key = @$sdata->api_key;
+      $api_status = @$sdata->status;
+      $test_username = @$sdata->test_username;
+
+      global $user;
+      $username = $user->name;
+
+      if(drupal_is_front_page()){
+        drupal_add_js($path . '/js/sendgrid_onload.js');
+
+        if($api_status == '1'){
+          if($username == $test_username ){
+            $output =  '<div id="popup1" class="overlay">';
+            $output .= '<div class="popup">';
+            $output .= '<a class="close" href="#"><img src="'.$path.'/images/close.png" /></a>';
+            $output .= '<div class="content">';
+            $output .= '<div id="msg"></div>';
+            $output .= '<div class="sendgrid_logo_container"><img src="'.$path.'/images/logo.png" /></div>';
+            $output .= '<div class="sendgrid_common_container"><div class="sendgrid_sub_title">Impact in your inbox!</div></div>';
+            $output .= '<div class="sendgrid_common_container sendgrid_sub_message">Sign up for more inspiring content.</div>';
+            $output .= '<div class="sendgrid_input_container"><input type="text" name="email" id="email" class="sendgrid_input" placeholder="Your Email Address" autocomplete="off" /></div>';
+            $output .= '<div class="sendgrid_input_container"><input type="submit" name="submit" class="sendgrid_submit" id="sendgrid_submit" value="Subscribe Now" /> <input type="submit" name="submit" class="sendgrid_cancel" id="sendgrid_cancel" value="No Thanks" /></div>';
+            $output .= '<div id="checkbox">
+                          <input id="hidePopup" type="checkbox" name="hidePopup" value="yes"><label for="checkbox1"><span></span>Don’t show this popup again</label>
+                          
+                        </div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+
+            echo $output;
+          }
+        }else if($api_status == '0'){
+        $output =  '<div id="popup1" class="overlay">';
+        $output .= '<div class="popup">';
+        $output .= '<a class="close" href="#"><img src="'.$path.'/images/close.png" /></a>';
+        $output .= '<div class="content">';
+        $output .= '<div id="msg"></div>';
+        $output .= '<div class="sendgrid_logo_container"><img src="'.$path.'/images/logo.png" /></div>';
+        $output .= '<div class="sendgrid_common_container"><div class="sendgrid_sub_title">Impact in your inbox!</div></div>';
+        $output .= '<div class="sendgrid_common_container sendgrid_sub_message">Sign up for more inspiring content.</div>';
+        $output .= '<div class="sendgrid_input_container"><input type="text" name="email" id="email" class="sendgrid_input" placeholder="Your Email Address" autocomplete="off" /></div>';
+        $output .= '<div class="sendgrid_input_container"><input type="submit" name="submit" class="sendgrid_submit" id="sendgrid_submit" value="Subscribe Now" /> <input type="submit" name="submit" class="sendgrid_cancel" id="sendgrid_cancel" value="No Thanks" /></div>';
+        $output .= '<div id="checkbox">
+                      <input id="hidePopup" type="checkbox" name="hidePopup" value="yes"><label for="checkbox1"><span></span>Don’t show this popup again</label>
+                      
+                    </div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        echo $output;
+        }
+        
+
+      }
+
+    }
+}
+
+// Create menu in backend
+function sendgrid_menu() {
+  $items = array();
+
+  $items['admin/sendgrid_setup'] = array( //this creates a URL that will call this form at "examples/form-example"
+    'title' => 'Sendgrid Setup', //page title
+    'description' => 'A form save sendgrid api and other info.',
+    'page callback' => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+    'page arguments' => array('sendgrid_form'), //put the name of the form here
+    'access callback' => TRUE
+  );
+
+
+  return $items;
+}
+
+// Generate Form in Backend
+function sendgrid_form($form, &$form_state) {
+
+  $squery = db_select('sendgrid_api', 'api_key');
+  $squery->fields('api_key');
+  $sresult = $squery->execute();
+  $sdata = $sresult->fetchObject();
+
+  //print_r($sdata);
+
+  $form['myform'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Sendgrid API Info:'),
+      '#prefix' => '<div id="sendgrid" class="sedrill_admin_main_container">',
+    );
+
+  $form['myform']['username'] = array(
+    '#type' => 'textfield', 
+    '#title' => 'Sendgrid Username',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->username,
+  );
+
+  $form['myform']['password'] = array(
+    '#type' => 'password', 
+    '#title' => 'Sendgrid Password',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->password,
+  );
+
+  $form['myform']['api_key'] = array(
+    '#type' => 'textfield', //you can find a list of available types in the form api
+    '#title' => 'API Key',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->api_key,
+  );
+
+  $form['myform']['secret_key'] = array(
+    '#type' => 'textfield', //you can find a list of available types in the form api
+    '#title' => 'API Secret Key',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->secret_key,
+  );
+
+  $form['myform']['subscriber_name'] = array(
+    '#type' => 'textfield', 
+    '#title' => 'Subscriber list name',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->subscriber_name,
+  );
+
+  $form['myform']['subscriber_id'] = array(
+    '#type' => 'textfield', 
+    '#title' => 'Subscriber ID',
+    '#required' => TRUE, //make this field required 
+    '#default_value' => @$sdata->subscriber_id,
+  );
+
+  $form['myform']['status'] = array(
+  '#type' => 'checkbox', 
+  '#title' => t('Testing Mode.'),
+  '#default_value' => (!empty(@$sdata->status)) ? TRUE : FALSE,
+  );
+
+  $form['myform']['test_username'] = array(
+    '#type' => 'textfield', 
+    '#title' => 'Username For Testing',
+    '#default_value' => @$sdata->test_username,
+  );
+
+  
+
+  if(!empty($sdata->id)){
+      $form['myform']['id'] = array(
+        '#type' => 'hidden', 
+        '#title' => 'id',
+        '#required' => TRUE, //make this field required 
+        '#value' => $sdata->id,
+      );
+      $form['myform']['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Update'),
+        '#suffix' => '</div>',
+      ); 
+  }else{
+      $form['myform']['submit_button'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save'),
+        '#suffix' => '</div>',
+      ); 
+  }
+  
+  
+  return $form;
+}
+
+// form validation
+function sendgrid_form_validate($form, &$form_state) {
+  
+}
+
+
+// Submit Form
+function sendgrid_form_submit($form, &$form_state) {
+  $post = array(
+        'api_key' => $form_state['values']['api_key'],
+        'secret_key' => $form_state['values']['secret_key'],
+        'subscriber_name' => $form_state['values']['subscriber_name'],
+        'subscriber_id' => $form_state['values']['subscriber_id'],
+        'username' => $form_state['values']['username'],
+        'password' => $form_state['values']['password'],
+        'status' => $form_state['values']['status'],
+        'test_username' => $form_state['values']['test_username'],
+  );
+
+  // print_r($post); exit;
+  if(!empty($form_state['values']['id'])){
+        // Update Api
+        $update = db_update('sendgrid_api')
+          ->fields($post)->condition('id', $form_state['values']['id'], '=')
+          ->execute();
+
+        if($insert>0){
+          drupal_set_message("API Info Updated Sucessfully!");
+        }else{
+          drupal_set_message(t("API Info not updated."), 'warning');
+        }
+  }else{
+        // Add API
+        $insert = db_insert('sendgrid_api')
+          -> fields($post)
+          ->execute();
+
+        if($insert>0){
+          drupal_set_message("API Info Save Sucessfully!");
+        }else{
+          drupal_set_message(t("API Info not inserted."), 'warning');
+        }
+  }
+  
+}
+
+?>

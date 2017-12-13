@@ -1,0 +1,233 @@
+.sedrill_admin_main_container{
+	width : 50%;
+	margin: 0px auto;
+	padding: 0px;
+}
+
+.sedrill_admin_main_container label{
+	padding-top: 2% !important;
+	padding-bottom: 2% !important; 
+}
+
+.sedrill_admin_main_container input[type=text]{
+	padding-top: 2% !important;
+	padding-bottom: 2% !important;
+	width: 100%;
+	border: 1px solid #e6e6e6 !important;
+}
+
+.sedrill_admin_main_container input[type=password]{
+  padding-top: 2% !important;
+  padding-bottom: 2% !important;
+  width: 100%;
+  border: 1px solid #e6e6e6 !important;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 100ms;
+  visibility: visible;
+  opacity: 1;
+  z-index: 9999;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+  z-index: 9999;
+}
+
+.popup {
+  margin: 5% auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  width: 40%;
+  position: relative;
+  background: #555555;
+  color:#fff;
+ /* transition: all 1s ease-in-out;*/
+}
+
+.popup h2 {
+  margin-top: 0;
+  color: #333;
+  font-family: AvenirLTStd-Heavy;
+}
+.popup .close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+.popup .close img{
+	width:20%;
+	float: right;
+
+}
+.popup .close:hover {
+  color: #06D85F;
+}
+.popup .content {
+  /*max-height: 30%;*/
+  overflow: auto;
+}
+
+.sendgrid_logo_container{
+  width: 100%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  display: table;
+  text-align: center;
+}
+
+.sendgrid_common_container{
+  width: 100%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  display: table;
+  text-align: center;
+  
+}
+
+.sendgrid_input_container{
+  width: 100%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  display: table;
+  text-align: center;
+  
+}
+.sendgrid_sub_title{
+  font-family: "AvenirLTStd-Heavy";
+  font-size: 2em;
+  font-weight: bold;
+  color: #fff;
+}
+
+.sendgrid_sub_message{
+  font-size: 20px;
+  color: #fff;
+}
+
+.sendgrid_input{
+  width:100%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  border:1px solid #ccc;
+  text-align: center;
+  font-family: "AvenirLTStd-Heavy";
+}
+.sendgrid_submit{
+  width:50%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  border:none;
+  text-align: center;
+  color: #fff;
+  background:  #13B5EA ;
+  font-size: 18px;
+  font-family: "AvenirLTStd-Heavy";
+  cursor: pointer;
+}
+.sendgrid_cancel{
+  width:49%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  border:none;
+  text-align: center;
+  color: #fff;
+  background:  #13B5EA ;
+  float:right;
+  font-size: 18px;
+  font-family: "AvenirLTStd-Heavy";
+  cursor: pointer;
+  margin-left:1%;
+}
+.send_error{
+  color: red;
+  padding:5px;
+  font-weight: bold;
+}
+
+.send_success{
+  color: green;
+  padding:5px;
+  font-weight: bold;
+}
+.sendgrid_not_show{
+  line-height: 25px;
+}
+.sendgrid_not_show input[type=checkbox]{
+  border : 1px solid #eee;
+  padding: 5px;
+}
+
+@media screen and (max-width: 700px){
+  .box{
+    width: 70%;
+  }
+  .popup{
+    width: 70%;
+  }
+}
+
+/*Checkbox style css code*/
+#checkbox input[type=checkbox]:not(old){
+  width     : 2em;
+  margin    : 0;
+  padding   : 0;
+  font-size : 1em;
+  opacity   : 0;
+}
+
+#checkbox input[type=checkbox]:not(old) + label{
+  display      : inline-block;
+  margin-left  : -2em;
+  line-height  : 1.5em;
+}
+
+#checkbox input[type=checkbox]:not(old) + label > span{
+  display          : inline-block;
+  width            : 0.875em;
+  height           : 0.875em;
+  margin           : 0.25em 0.5em 0.25em 0.25em;
+  border           : 0.0625em solid rgb(192,192,192);
+  border-radius    : 0.25em;
+  background       : rgb(224,224,224);
+  background-image :    -moz-linear-gradient(rgb(240,240,240),rgb(224,224,224));
+  background-image :     -ms-linear-gradient(rgb(240,240,240),rgb(224,224,224));
+  background-image :      -o-linear-gradient(rgb(240,240,240),rgb(224,224,224));
+  background-image : -webkit-linear-gradient(rgb(240,240,240),rgb(224,224,224));
+  background-image :         linear-gradient(rgb(240,240,240),rgb(224,224,224));
+  vertical-align   : bottom;
+}
+
+#checkbox input[type=checkbox]:not(old):checked + label > span{
+  background-image :    -moz-linear-gradient(rgb(224,224,224),rgb(240,240,240));
+  background-image :     -ms-linear-gradient(rgb(224,224,224),rgb(240,240,240));
+  background-image :      -o-linear-gradient(rgb(224,224,224),rgb(240,240,240));
+  background-image : -webkit-linear-gradient(rgb(224,224,224),rgb(240,240,240));
+  background-image :         linear-gradient(rgb(224,224,224),rgb(240,240,240));
+}
+
+#checkbox input[type=checkbox]:not(old):checked + label > span:before{
+  content     : '✓';
+  display     : block;
+  width       : 1em;
+  color       : rgba(255, 26, 26, 1);
+  font-size   : 0.875em;
+  line-height : 1em;
+  text-align  : center;
+  text-shadow : 0 0 0.0714em rgb(115,153,77);
+  font-weight : bold;
+}
+

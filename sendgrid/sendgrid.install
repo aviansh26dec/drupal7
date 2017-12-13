@@ -1,0 +1,74 @@
+<?php
+/**
+ * @file
+ * Install,and uninstall functions for the Sendgrid module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function sendgrid_schema() {
+
+  $schema['sendgrid_api'] = array(
+    'description' => t('The base table for sendgrid api info.'),
+    'fields' => array(
+      'id' => array(
+        'description' => t('The primary identifier for a sendgrid_api.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'api_key' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'secret_key' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'subscriber_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'subscriber_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'username' => array(
+        'type' => 'varchar',
+        'length' => 255,
+         ),
+      'password' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        ),
+      'test_username' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        ),
+      ),
+      'indexes' => array(
+      'api_key'        => array('api_key'),
+      ),
+      'primary key' => array('id'),
+  );
+
+  return $schema;
+}
+
+function sendgrid_enable() {
+  //Check if table exists, if not install the schema.
+  if(db_table_exists('sendgrid_api') == FALSE) {
+    drupal_install_schema('sendgrid');
+  }
+}
+
+function sendgrid_disable() {
+  if(db_table_exists('sendgrid_api') == TRUE) {
+    return Database::getConnection()->schema()->dropTable('sendgrid_api');
+  }
+}
+

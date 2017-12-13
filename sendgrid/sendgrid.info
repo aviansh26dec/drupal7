@@ -1,0 +1,6 @@
+name = Sendgrid
+description = Appear subscription form popup on home page.
+core = 7.x
+php =  5.2.4
+version = 7.x.1.0
+package = Sendgrid
